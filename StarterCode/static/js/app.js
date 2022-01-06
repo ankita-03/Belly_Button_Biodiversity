@@ -31,8 +31,8 @@ function barChart() {
         let values = data.samples;
         let graph = values.filter(obj => obj.id == index);
         let chart1 = graph[0]; 
-        let xaxis = chart1.sample_values.slice(0, 10);  
-        let yaxis = chart1.otu_ids.slice(0,10); 
+        let xaxis = chart1.sample_values.slice(0, 10).reverse();  
+        let yaxis = chart1.otu_ids.slice(0,10).reverse(); 
         let hoverText = chart1.otu_labels;
         // console.log()
         let axisTitles = {
@@ -73,13 +73,12 @@ function bubbleChart() {
             title: 'Belly Button Bubble Chart'
         };
 
-        Plotly.newPlot('bubble', axis, layout)
-    })
+        Plotly.newPlot('bubble', axis, layout);
+    });
     
 }
 
-function finalDisplay () {
+function finalDisplay() {
+    let final = d3.json
     
 }
-
-
