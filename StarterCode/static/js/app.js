@@ -2,100 +2,73 @@ d3.json('samples.json').then(({names})=>{
     names.forEach(name => {
         d3.select('select').append('option').text(name);
     });
-    displayCharts();
+    init();
 
-})
-displayCharts();
+});
 
-function displayCharts() {
+function init() {
     let sel = d3.select('select').node().value; 
 
     d3.json('samples.json').then(({metadata, samples})=>{
         let meta = metadata.filter(obj => obj.id == sel)[0];
         let sample = samples.filter(obj => obj.id == sel)[0];
-        console.log(meta, sample);
+        const panel = d3.select('.panel-body');
 
-        // names.forEach(name => {
-            // d3.select('select').append('option').text(name);
-        // });
+        panel.html('');
+        Object.entries(meta).forEach(([key,val])=>{
+            panel.append('h5').text(`${key.toUpperCase()}: ${val}`)
+        })
+
+        let { otu_ids, sample_values, otu_labels } = sample;
+
+        console.log(otu_ids,sample_values,otu_labels);
+        var data = [
+            {
+              x: sample_values.slice(0,10).reverse(),
+              y: otu_ids.slice(0,10).reverse().map(otu_ids => `OTU ${otu_ids}`),
+              text: otu_labels.slice(0,10).reverse(),
+              type: 'bar',
+              orientation: 'h'
+            }
+          ];
+
+          let display = {
+            title: "Belly Button Bacteria"
+        };
+          
+          Plotly.newPlot('bar', data, display);
+        
+          
+          var data = [
+            {
+              domain: { x: [0, 1], y: [0, 1] },
+              value: meta.wfreq,
+              title: { text: "Washing Freq" },
+              type: "indicator",
+              mode: "gauge+number",
+              delta: { reference: 400 },
+              gauge: { axis: { range: [null, 9] } }
+            }
+          ];
+          
+          var layout = {width:500};
+          Plotly.newPlot('gauge', data, layout);
+
+          var trace1 = {
+            x: otu_ids,
+            y: sample_values,
+            mode: 'markers',
+            text: otu_labels,
+            marker: {size:sample_values, color:otu_ids, colorscale:'Earth'} 
+          };
+          
+          var data = [trace1];
+          
+          Plotly.newPlot('bubble', data);
+          
     });
-
-
 
 }
 function optionChanged() {
-    displayCharts();
-    // d3.json('samples.json').then(( )
-}
-
-// add hovertext 
-function barChart(index) {
-    // let index = d3.select('select').node.value; 
-    d3.json('sample.json').then((data) => {
-        let values = data.samples;
-        let graph = values.filter(indexobj => indexobj.id == index);
-        let chart1 = graph[0]; 
-        let xaxis = chart1.sample_values.slice(0, 10).reverse();  
-        let yaxis = chart1.otu_ids.slice(0,10).reverse(); 
-        let hoverText = chart1.otu_labels;
-        // console.log()
-        let axisTitles = [{
-            x:xaxis,
-            y:yaxis,
-            type: "bar",
-            orientation: "h",
-            text:hoverText
-        }]
-
-        let display = {
-            title: "Belly Button Bacteria"
-        };
-
-        Plotly.newPlot('bar', axisTitles, display);
-
-    });
-
-}
-
-function bubbleChart(index1) {
-    // let index1 = d3.select('select'); 
-    d3.json('samples.json').then((data2) => {
-        let sets = data2.samples; 
-        let bubbles = sets.filter(index1obj => index1obj.id == index1)
-        let chart2 = bubbles[0];
-        let axis = [{
-            x: chart2.otu_ids, 
-            y: chart2.sample_values, 
-            mode: 'markers', 
-            marker: {size:chart2.sample_values, 
-                color:chart2.otu_ids
-            },
-            text: chart2.otu_labels
-        }];
-
-        let layout = {
-            title: 'Belly Button Bubble Chart'
-        };
-
-        Plotly.newPlot('bubble', axis, layout);
-    });
-    
-}
-
-function init() {
-    let set = d3.select("#selDataset");
-    d3.json("sample.json").then((data3) => {
-        let samp = data3.names;
-        samp.forEach((sample) => {
-            set.append("option").text(sample).property("value", sample);
-        });
-            let display = samp[0];
-            barChart(display);
-            bubbleChart(display);
-    });
-}
-function optionChanged(newSample) {
-    barChart(newSample);
-    bubbleChart(newSample);
-}
-init();
+    init();
+};
